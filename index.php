@@ -9,5 +9,5 @@
  * @brief Wrapper for the Plugin Template plugin.
  *
  */
-require_once('PluginTemplatePlugin.inc.php');
-return new PluginTemplatePlugin();
+require_once('ImportConfigPlugin.inc.php');
+return new ImportConfigPlugin();

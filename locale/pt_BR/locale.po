@@ -12,13 +12,13 @@ msgstr ""
 "Language: \n"
 
 msgid "plugins.generic.importConfig.displayName"
-msgstr "Import plugin"
+msgstr "Plugin de importação"
 
 msgid "plugins.generic.importConfig.description"
-msgstr "A plugin for import site's settings."
+msgstr "Este plugin importa as configurações do portal."
 
 msgid "plugins.generic.importConfig.templateDescription"
-msgstr "Import site settings: custom block, custom header, plugin theme and style sheet."
+msgstr "Importe as configurações do portal: Blocos Personalizados, Cabeçalho Personalizado, Plugin de tema e Folha de estilo."
 
 msgid "plugins.generic.importConfig.templateWarning"
-msgstr "Importing site settings means overwriting these journal settings!"
+msgstr "Importar as configurações do portal significa sobrescrever essas configurações da revista!"

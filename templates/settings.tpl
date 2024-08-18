@@ -22,15 +22,11 @@
 	<!-- Always add the csrf token to secure your form -->
 	{csrf}
 
-	{fbvFormArea id="templatePluginSettingsArea"}
-		{fbvFormSection label="plugins.generic.pluginTemplate.publicationStatement"}
-			{fbvElement
-				type="text"
-				id="publicationStatement"
-				value=$publicationStatement
-				description="plugins.generic.pluginTemplate.publicationStatement.description"
-			}
-		{/fbvFormSection}
-	{/fbvFormArea}
+	<p>{translate key="plugins.generic.importConfig.templateDescription"}</p>
+
+	<div style="color: red; font-weight: bold;">
+		<p>{translate key="plugins.generic.importConfig.templateWarning"}</p>
+	</div>
+
 	{fbvFormButtons submitText="common.save"}
 </form>
