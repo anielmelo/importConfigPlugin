@@ -18,7 +18,7 @@ msgid "plugins.generic.importConfig.description"
 msgstr "A plugin for import site's settings."
 
 msgid "plugins.generic.importConfig.templateDescription"
-msgstr "Import site settings: custom block, custom header, plugin theme and style sheet."
+msgstr "Import site settings: custom block, custom header, plugin theme, navigation menu and style sheet."
 
 msgid "plugins.generic.importConfig.templateWarning"
 msgstr "Importing site settings means overwriting these journal settings!"
