@@ -159,6 +159,23 @@ class ImportConfigSettingsForm extends Form {
 		}
 
 		foreach ($configuration as $setting_name => $setting_value) {
+
+			if ($configName == 'styleSheet') {
+				$data = json_decode($setting_value, true);
+				$style = $data['uploadName'];
+
+				$publicDir = realpath('public');
+				$sourceFile = $publicDir . '/site/' . $style;
+				$destinationDir = $publicDir . '/journals/' . $currentContextId . '/';
+				$destinationFile = $destinationDir . $style;
+
+				if (copy($sourceFile, $destinationFile)) {
+					error_log('Arquivo copiado com sucesso para: ' . $destinationDir);
+			        } else {
+			        	error_log('Falha ao copiar o arquivo.');
+			        }
+			}
+
 			$settingDao->updateJournalSetting($currentContextId, $setting_name, $setting_value);
 		}
 	}

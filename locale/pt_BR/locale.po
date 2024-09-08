@@ -18,7 +18,7 @@ msgid "plugins.generic.importConfig.description"
 msgstr "Este plugin importa as configurações do portal."
 
 msgid "plugins.generic.importConfig.templateDescription"
-msgstr "Importe as configurações do portal: Blocos Personalizados, Cabeçalho Personalizado, Plugin de tema, Menu de navegação e Folha de estilo."
+msgstr "Importe as configurações do portal: Blocos Personalizados, Cabeçalho Personalizado, Plugin de tema e Folha de estilo."
 
 msgid "plugins.generic.importConfig.templateWarning"
 msgstr "Importar as configurações do portal significa sobrescrever essas configurações da revista!"
