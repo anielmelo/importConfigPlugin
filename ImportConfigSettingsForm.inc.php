@@ -22,11 +22,29 @@ class ImportConfigSettingsForm extends Form {
 		$this->addCheck(new FormValidatorCSRF($this));
 	}
 
-	public function initData() {
+  public function initData() {
+    $contextDao = DAORegistry::getDAO('SiteJournalDAO');
+    
+    $context = Application::get()->getRequest()->getContext();
+    $currentContextId = $context->getId();
+
+    $journals = $contextDao->getAll($currentContextId);
+
+
+    $journalOptions = [];
+    $journalOptions[0] = 'Portal';
+    
+    foreach ($journals as $journal_id => $journal_name) {
+      $journalOptions[$journal_id] = $journal_name;
+    }
+
+    $this->setData('journalOptions', $journalOptions);
 		parent::initData();
 	}
 
-	public function readInputData() {
+  public function readInputData() {
+
+    $this->readUserVars(['selectedJournal']);
 		parent::readInputData();
 	}
 
@@ -37,19 +55,21 @@ class ImportConfigSettingsForm extends Form {
 		return parent::fetch($request, $template, $display);
 	}
 
-	public function execute(...$functionArgs) {
-		$context = Application::get()->getRequest()->getContext();
+  public function execute(...$functionArgs) {
 
-		if (!$context) {
-			return false;
-		}
+    $sourceContextId = $this->getData('selectedJournal');
+    
+    $context = Application::get()->getRequest()->getContext();
+    
+    if (!$context) {
+      return false;
+    }
 
-		$portalId = 0;
-		$currentContextId = $context->getId();
+    $currentContextId = $context->getId();
 
-		$this->importPlugins($portalId, $currentContextId);
-		$this->applyConfiguration($portalId, $currentContextId);
-		$this->importNavigationMenu($portalId, $currentContextId);
+    $this->importPlugins($sourceContextId, $currentContextId);
+    $this->applyConfiguration($sourceContextId, $currentContextId);
+    $this->importNavigationMenu($sourceContextId, $currentContextId);
 
 		import('classes.notification.NotificationManager');
 		$notificationMgr = new NotificationManager();
@@ -65,10 +85,10 @@ class ImportConfigSettingsForm extends Form {
 	/**
 	 * Import plugins from PluginSettingsDAO.
 	 *
-	 * @param $portalId int site's ID to export data
+	 * @param $sourceContextId int site's ID to export data
 	 * @param $currentContextId int journal's ID to import data from site
 	 */
-	private function importPlugins($portalId, $currentContextId) {
+	private function importPlugins($sourceContextId, $currentContextId) {
 		$pluginDao = DAORegistry::getDAO('PluginSettingsDAO');
 
 		if (!$pluginDao) {
@@ -76,21 +96,21 @@ class ImportConfigSettingsForm extends Form {
 			return false;
 		}
 
-		$this->insertPlugin($portalId, $currentContextId, $pluginDao, 'customblockmanagerplugin');
-		$this->insertPlugin($portalId, $currentContextId, $pluginDao, 'customheaderplugin');
-		$this->insertPlugin($portalId, $currentContextId, $pluginDao, 'defaultchildthemeplugin');
+		$this->insertPlugin($sourceContextId, $currentContextId, $pluginDao, 'customblockmanagerplugin');
+		$this->insertPlugin($sourceContextId, $currentContextId, $pluginDao, 'customheaderplugin');
+		$this->insertPlugin($sourceContextId, $currentContextId, $pluginDao, 'defaultchildthemeplugin');
 	}
 
 	/**
 	 * Insert plugin settings from site to current journal.
 	 *
-	 * @param $portalId int site's ID to export data
+	 * @param $sourceContextId int site's ID to export data
 	 * @param $currentContextId int journal's ID to import data from site
 	 * @param $pluginDao class DAO to get plugin settings
 	 * @param $pluginName string to access the specific plugin
 	 */
-	private function insertPlugin($portalId, $currentContextId, $pluginDao, $pluginName) {
-		$pluginSettings = $pluginDao->getPluginSettings($portalId, $pluginName);
+	private function insertPlugin($sourceContextId, $currentContextId, $pluginDao, $pluginName) {
+		$pluginSettings = $pluginDao->getPluginSettings($sourceContextId, $pluginName);
 
 		if (!$pluginSettings) {
 			error_log('plugin_settings not found for ' . $pluginName);
@@ -101,7 +121,7 @@ class ImportConfigSettingsForm extends Form {
 			$pluginDao->updateSetting($currentContextId, $pluginName, $setting_name, $setting_value);
 
 			if ($setting_name === 'blocks') {
-				$this->insertBlocks($portalId, $currentContextId, $pluginDao, $setting_value);
+				$this->insertBlocks($sourceContextId, $currentContextId, $pluginDao, $setting_value);
 			}
 		}
 	}
@@ -109,14 +129,14 @@ class ImportConfigSettingsForm extends Form {
 	/**
 	 * Insert blocks from the site's customBlockManager to current journal.
 	 *
-	 * @param $portalId int site's ID to export data
+	 * @param $sourceContextId int site's ID to export data
 	 * @param $currentContextId int journal's ID to import data from site
 	 * @param $pluginDao class DAO to get plugin settings
 	 * @param $blockList array blockList from site
 	 */
-	private function insertBlocks($portalId, $currentContextId, $pluginDao, $blockList) {
+	private function insertBlocks($sourceContextId, $currentContextId, $pluginDao, $blockList) {
 		foreach ($blockList as $index => $block_name) {
-			$block_settings = $pluginDao->getPluginSettings($portalId, $block_name);
+			$block_settings = $pluginDao->getPluginSettings($sourceContextId, $block_name);
 			foreach ($block_settings as $setting_name => $setting_value) {
 				$pluginDao->updateSetting($currentContextId, $block_name, $setting_name, $setting_value);
 			}
@@ -126,10 +146,10 @@ class ImportConfigSettingsForm extends Form {
 	/**
 	 * Apply specific settings from site to current journal with ImportConfigDAO.
 	 *
-	 * @param $portalId int site's ID to export data
+	 * @param $sourceContextId int site's ID to export data
 	 * @param $currentContextId int journal's ID to import data from site
 	 */
-	private function applyConfiguration($portalId, $currentContextId) {
+	private function applyConfiguration($sourceContextId, $currentContextId) {
 		$settingDao = DAORegistry::getDAO('SiteJournalDAO');
 
 		if (!$settingDao) {
@@ -137,22 +157,26 @@ class ImportConfigSettingsForm extends Form {
 			return false;
 		}
 
-		$this->insertConfigurationInContext($portalId, $currentContextId, $settingDao, 'sidebar');
-		$this->insertConfigurationInContext($portalId, $currentContextId, $settingDao, 'themePluginPath');
-		$this->insertConfigurationInContext($portalId, $currentContextId, $settingDao, 'styleSheet');
+		$this->insertConfigurationInContext($sourceContextId, $currentContextId, $settingDao, 'sidebar');
+		$this->insertConfigurationInContext($sourceContextId, $currentContextId, $settingDao, 'themePluginPath');
+		$this->insertConfigurationInContext($sourceContextId, $currentContextId, $settingDao, 'styleSheet');
 	}
 
 	/**
 	 * Insert site setting into current journal.
 	 *
-	 * @param $portalId int site's ID to export data
+	 * @param $sourceContextId int site's ID to export data
 	 * @param $currentContextId int journal's ID to import data from site
 	 * @param $settingDao class DAO to get/update a setting
 	 * @param $configName string to access the specific setting
 	 */
-	private function insertConfigurationInContext($portalId, $currentContextId, $settingDao, $configName) {
-		$configuration = $settingDao->getSiteSetting($configName);
-
+  private function insertConfigurationInContext($sourceContextId, $currentContextId, $settingDao, $configName) {
+    if ($sourceContextId == 0) {
+      $configuration = $settingDao->getSiteSetting($configName);
+    } else {
+      $configuration = $settingDao->getJournalSetting($sourceContextId, $configName);
+    }
+    
 		if (!$configuration) {
 			error_log('configuration not found: ' . $configName);
 			return;
@@ -160,34 +184,45 @@ class ImportConfigSettingsForm extends Form {
 
 		foreach ($configuration as $setting_name => $setting_value) {
 
-			if ($configName == 'styleSheet') {
-				$data = json_decode($setting_value, true);
-				$style = $data['uploadName'];
-
-				$publicDir = realpath('public');
-				$sourceFile = $publicDir . '/site/' . $style;
-				$destinationDir = $publicDir . '/journals/' . $currentContextId . '/';
-				$destinationFile = $destinationDir . $style;
-
-				if (copy($sourceFile, $destinationFile)) {
-					error_log('Arquivo copiado com sucesso para: ' . $destinationDir);
-			        } else {
-			        	error_log('Falha ao copiar o arquivo.');
-			        }
+      if ($configName == 'styleSheet') {
+        $this->copyStyleSheet($setting_value, $sourceContextId, $currentContextId);
 			}
 
 			$settingDao->updateJournalSetting($currentContextId, $setting_name, $setting_value);
 		}
 	}
 
+  private function copyStyleSheet($styleSheet, $sourceContextId, $currentContextId) {
+    $data = json_decode($styleSheet, true);
+    $style = $data['uploadName'];
+    $sourceDirectory = '';
+
+    if ($sourceContextId == 0) {
+      $sourceDirectory = 'site';
+    } else {
+      $sourceDirectory = 'journals' . '/' . $sourceContextId;
+    }
+
+    $publicDir = realpath('public');
+    $sourceFile = $publicDir . '/' . $sourceDirectory . '/' . $style;
+    $destinationDir = $publicDir . '/journals/' . $currentContextId . '/';
+    $destinationFile = $destinationDir . $style;
+
+    if (copy($sourceFile, $destinationFile)) {
+      error_log('File successfully copied to: ' . $destinationDir);
+    } else {
+      error_log('Failed to copy the file.');
+    }
+  }
+
 	/**
 	 * Imports navigation menus and items from one context to another.
 	 *
-	 * @param int $portalId The ID of the source context from which navigation menus and items will be imported.
+	 * @param int $sourceContextId The ID of the source context from which navigation menus and items will be imported.
 	 * @param int $currentContextId The ID of the target context where the navigation menus and items will be inserted.
 	 * @return bool Returns false if the NavigationDAO cannot be retrieved, otherwise void.
 	 */
-	private function importNavigationMenu($portalId, $currentContextId) {
+	private function importNavigationMenu($sourceContextId, $currentContextId) {
 		$navigationDao = DAORegistry::getDAO('NavigationDAO');
 
 		if (!$navigationDao) {
@@ -197,9 +232,9 @@ class ImportConfigSettingsForm extends Form {
 
 		$this->deleteNavigationPreviousSettings($currentContextId, $navigationDao);
 
-		$this->insertNavigationMenu($portalId, $currentContextId, $navigationDao);
+		$this->insertNavigationMenu($sourceContextId, $currentContextId, $navigationDao);
 
-		$this->applyNavigation($portalId, $currentContextId, $navigationDao);
+		$this->applyNavigation($sourceContextId, $currentContextId, $navigationDao);
 	}
 
 	/**
@@ -235,14 +270,14 @@ class ImportConfigSettingsForm extends Form {
 	/**
 	 * Inserts navigation menus and items into the target context.
 	 *
-	 * @param int $portalId The ID of the source context from which navigation menus and items will be imported.
+	 * @param int $sourceContextId The ID of the source context from which navigation menus and items will be imported.
 	 * @param int $currentContextId The ID of the target context where the navigation menus and items will be inserted.
 	 * @param NavigationDAO $navigationDao The data access object used to manage navigation-related data.
 	 * @return void
 	 */
-	private function insertNavigationMenu($portalId, $currentContextId, $navigationDao) {
-		$menusPortal = $navigationDao->getNavigationData('navigation_menus', 'context_id', $portalId);
-		$itemsPortal = $navigationDao->getNavigationData('navigation_menu_items', 'context_id', $portalId);
+	private function insertNavigationMenu($sourceContextId, $currentContextId, $navigationDao) {
+		$menusPortal = $navigationDao->getNavigationData('navigation_menus', 'context_id', $sourceContextId);
+		$itemsPortal = $navigationDao->getNavigationData('navigation_menu_items', 'context_id', $sourceContextId);
 
 		if (!$menusPortal) {
 			error_log('navigation menus not found!');
@@ -262,20 +297,20 @@ class ImportConfigSettingsForm extends Form {
 			$navigationDao->updateNavigationItem($currentContextId, $item['path'], $item['type']);
 		}
 
-		$this->insertNavigationSettings($portalId, $currentContextId, $navigationDao);
+		$this->insertNavigationSettings($sourceContextId, $currentContextId, $navigationDao);
 	}
 
 	/**
 	 * Inserts navigation settings for the newly imported navigation items in the target context.
 	 *
-	 * @param int $portalId The ID of the source context from which navigation item settings will be imported.
+	 * @param int $sourceContextId The ID of the source context from which navigation item settings will be imported.
 	 * @param int $currentContextId The ID of the target context where the navigation item settings will be inserted.
 	 * @param NavigationDAO $navigationDao The data access object used to manage navigation-related data.
 	 * @return void
 	 */
-	private function insertNavigationSettings($portalId, $currentContextId, $navigationDao) {
+	private function insertNavigationSettings($sourceContextId, $currentContextId, $navigationDao) {
 		$itemsFromCurrentContext = $navigationDao->getNavigationData('navigation_menu_items', 'context_id', $currentContextId);
-		$itemsFromPortal = $navigationDao->getNavigationData('navigation_menu_items', 'context_id', $portalId);
+		$itemsFromPortal = $navigationDao->getNavigationData('navigation_menu_items', 'context_id', $sourceContextId);
 
 		for ($i = 0; $i < count($itemsFromPortal); $i++) {
 			$itemCurrentContext = $itemsFromCurrentContext[$i];
@@ -292,13 +327,13 @@ class ImportConfigSettingsForm extends Form {
 	/**
 	 * Applies the navigation item assignments in the target context based on the imported data.
 	 *
-	 * @param int $portalId The ID of the source context from which navigation assignments will be imported.
+	 * @param int $sourceContextId The ID of the source context from which navigation assignments will be imported.
 	 * @param int $currentContextId The ID of the target context where the navigation assignments will be applied.
 	 * @param NavigationDAO $navigationDao The data access object used to manage navigation-related data.
 	 * @return void
 	 */
-	private function applyNavigation($portalId, $currentContextId, $navigationDao) {
-		$assignments = $this->getNavigationAssignments($portalId, $navigationDao);
+	private function applyNavigation($sourceContextId, $currentContextId, $navigationDao) {
+		$assignments = $this->getNavigationAssignments($sourceContextId, $navigationDao);
 
 		if (!$assignments) {
 			error_log('assignments not found!');

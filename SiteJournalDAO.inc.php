@@ -15,6 +15,56 @@
 import('lib.pkp.classes.db.DAO');
 class SiteJournalDAO extends DAO {
 
+  function getAll($currentContextId) {
+    $result = $this->retrieve(
+      'select journal_id, setting_value from journal_settings where setting_name = "name" and setting_value != "NULL" and journal_id != ?',
+      array($currentContextId)
+    );
+
+    $journals = array();
+
+    foreach ($result as $row) {
+      $journals[$row->journal_id] = $row->setting_value;
+    }
+
+    if (count($journals) == 0) {
+      return null;
+    }
+
+    return $journals;
+  }
+
+  function getOneById($id) {
+    if ($id == 0) {
+      $result = $this->retrieve(
+        'select setting_value site_name from site_settings where setting_name = "title" and locale = "pt_BR";',
+      );
+    } else {
+      $result = $this->retrieve(
+        'select journal_id, setting_value from journal_settings where setting_name = "name" and setting_value != "NULL" and journal_id = ?',
+        array($id)
+      );
+    }
+
+    $name = array();
+
+    if ($id == 0) {
+      foreach ($result as $row) {
+        $name[] = $row->site_name;
+      }
+    } else {
+      foreach ($result as $row) {
+        $name[$row->journal_id] = $row->setting_value;
+      }
+    }
+
+    if (count($name) == 0) {
+      return null;
+    }
+
+    return $name;
+  }
+
 	/**
 	 * Retrieve a site setting.
 	 * @param $settingName string Setting name

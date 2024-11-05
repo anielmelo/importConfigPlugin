@@ -22,7 +22,14 @@
 	<!-- Always add the csrf token to secure your form -->
 	{csrf}
 
-	<p>{translate key="plugins.generic.importConfig.templateDescription"}</p>
+  <label for="journalSelect">Selecione uma Revista:</label>
+  <select name="selectedJournal" id="journalSelect">
+    {foreach from=$journalOptions key=journalId item=journalName}
+        <option value="{$journalId}">{$journalName}</option>
+    {/foreach}
+  </select>
+
+  <p>{translate key="plugins.generic.importConfig.templateDescription"}</p>
 
 	<div style="color: red; font-weight: bold;">
 		<p>{translate key="plugins.generic.importConfig.templateWarning"}</p>

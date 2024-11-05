@@ -16,10 +16,10 @@ class ImportConfigPlugin extends GenericPlugin {
 		$success = parent::register($category, $path);
 		if ($success && $this->getEnabled()) {
 			$this->import('SiteJournalDAO');
-		        DAORegistry::registerDAO('SiteJournalDAO', new SiteJournalDAO());
+      DAORegistry::registerDAO('SiteJournalDAO', new SiteJournalDAO());
 
 			$this->import('NavigationDAO');
-		        DAORegistry::registerDAO('NavigationDAO', new NavigationDAO());
+      DAORegistry::registerDAO('NavigationDAO', new NavigationDAO());
 		}
 		return $success;
 	}
