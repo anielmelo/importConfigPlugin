@@ -15,55 +15,29 @@
 import('lib.pkp.classes.db.DAO');
 class SiteJournalDAO extends DAO {
 
-  function getAll($currentContextId) {
-    $result = $this->retrieve(
-      'select journal_id, setting_value from journal_settings where setting_name = "name" and setting_value != "NULL" and journal_id != ?',
-      array($currentContextId)
-    );
+	/**
+	 * Retrieve all journals except the specified one.
+	 * @param $currentContextId int Context ID to exclude
+	 * @return null||array
+	 */
+	function getAll($currentContextId) {
+		$result = $this->retrieve(
+			'SELECT journal_id, setting_value FROM journal_settings WHERE setting_name = "name" AND setting_value != "NULL" AND journal_id != ?',
+			array($currentContextId)
+		);
 
-    $journals = array();
+		$journals = array();
 
-    foreach ($result as $row) {
-      $journals[$row->journal_id] = $row->setting_value;
-    }
+		foreach ($result as $row) {
+			$journals[$row->journal_id] = $row->setting_value;
+		}
 
-    if (count($journals) == 0) {
-      return null;
-    }
+		if (count($journals) == 0) {
+			return null;
+		}
 
-    return $journals;
-  }
-
-  function getOneById($id) {
-    if ($id == 0) {
-      $result = $this->retrieve(
-        'select setting_value site_name from site_settings where setting_name = "title" and locale = "pt_BR";',
-      );
-    } else {
-      $result = $this->retrieve(
-        'select journal_id, setting_value from journal_settings where setting_name = "name" and setting_value != "NULL" and journal_id = ?',
-        array($id)
-      );
-    }
-
-    $name = array();
-
-    if ($id == 0) {
-      foreach ($result as $row) {
-        $name[] = $row->site_name;
-      }
-    } else {
-      foreach ($result as $row) {
-        $name[$row->journal_id] = $row->setting_value;
-      }
-    }
-
-    if (count($name) == 0) {
-      return null;
-    }
-
-    return $name;
-  }
+		return $journals;
+	}
 
 	/**
 	 * Retrieve a site setting.
@@ -72,8 +46,8 @@ class SiteJournalDAO extends DAO {
 	 */
 	function getSiteSetting($settingName) {
 		$result = $this->retrieve(
-		    'SELECT setting_name, setting_value FROM site_settings WHERE setting_name = ?',
-		    array($settingName)
+			'SELECT setting_name, setting_value FROM site_settings WHERE setting_name = ?',
+			array($settingName)
 		);
 
 		$site_setting = array();
@@ -97,8 +71,8 @@ class SiteJournalDAO extends DAO {
 	 */
 	function getJournalSetting($journalId, $settingName) {
 		$result = $this->retrieve(
-		    'SELECT setting_name, setting_value FROM journal_settings WHERE journal_id = ? and setting_name = ?',
-		    array((int) $journalId, $settingName)
+			'SELECT setting_name, setting_value FROM journal_settings WHERE journal_id = ? and setting_name = ?',
+			array((int) $journalId, $settingName)
 		);
 
 		$journal_setting = array();
@@ -123,14 +97,14 @@ class SiteJournalDAO extends DAO {
 	 */
 	function updateJournalSetting($journalId, $settingName, $settingValue, $settingType = NULL) {
 		$this->replace(
-		    'journal_settings',
-		    array(
-			'journal_id' => (int) $journalId,
-		        'setting_name' => $settingName,
-		        'setting_value' => $settingValue,
-		        'setting_type' => $settingType,
-		    ),
-		    array('journal_id', 'setting_name')
+			'journal_settings',
+			array(
+				'journal_id' => (int) $journalId,
+				'setting_name' => $settingName,
+				'setting_value' => $settingValue,
+				'setting_type' => $settingType,
+			),
+			array('journal_id', 'setting_name')
 		);
 	}
 

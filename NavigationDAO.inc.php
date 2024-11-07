@@ -22,7 +22,7 @@ class NavigationDAO extends DAO {
 		$data = array();
 
 		$result = $this->retrieve('SELECT * FROM ' . $tableName . ' WHERE ' . $columnName . ' = ?;',
-		[(int) $id]);
+			[(int) $id]);
 
 		foreach ($result as $row) {
 			$data[] = (array) $row;
@@ -47,7 +47,7 @@ class NavigationDAO extends DAO {
 		$assign = array();
 
 		$result = $this->retrieve('SELECT * FROM navigation_menu_item_assignments WHERE navigation_menu_id = ? AND navigation_menu_item_id = ?;',
-		[(int) $menuId, (int) $itemId]);
+			[(int) $menuId, (int) $itemId]);
 
 		foreach ($result as $row) {
 			$assign[] = (array) $row;
@@ -152,7 +152,7 @@ class NavigationDAO extends DAO {
 	 */
 	function deleteMenus($contextId) {
 		return $this->update('DELETE FROM navigation_menus WHERE context_id = ?;',
-		[(int) $contextId]);
+			[(int) $contextId]);
 	}
 
 	/**
@@ -163,7 +163,7 @@ class NavigationDAO extends DAO {
 	 */
 	function deleteItems($contextId) {
 		return $this->update('DELETE FROM navigation_menu_items WHERE context_id = ?;',
-		[(int) $contextId]);
+			[(int) $contextId]);
 	}
 
 	/**
@@ -175,7 +175,7 @@ class NavigationDAO extends DAO {
 	 */
 	function deleteAssignments($menuId, $itemId) {
 		return $this->update('DELETE FROM navigation_menu_item_assignments WHERE navigation_menu_id = ? AND navigation_menu_item_id = ?;',
-		[(int) $menuId, (int) $itemId]);
+			[(int) $menuId, (int) $itemId]);
 	}
 
 	/**
@@ -186,6 +186,6 @@ class NavigationDAO extends DAO {
 	 */
 	function deleteSettingById($navigationItemId) {
 		return $this->update('DELETE FROM navigation_menu_item_settings WHERE navigation_menu_item_id = ?;',
-		[(int) $navigationItemId]);
+			[(int) $navigationItemId]);
 	}
 }

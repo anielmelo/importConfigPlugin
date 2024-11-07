@@ -16,10 +16,10 @@ class ImportConfigPlugin extends GenericPlugin {
 		$success = parent::register($category, $path);
 		if ($success && $this->getEnabled()) {
 			$this->import('SiteJournalDAO');
-      DAORegistry::registerDAO('SiteJournalDAO', new SiteJournalDAO());
+			DAORegistry::registerDAO('SiteJournalDAO', new SiteJournalDAO());
 
 			$this->import('NavigationDAO');
-      DAORegistry::registerDAO('NavigationDAO', new NavigationDAO());
+			DAORegistry::registerDAO('NavigationDAO', new NavigationDAO());
 		}
 		return $success;
 	}
@@ -77,21 +77,21 @@ class ImportConfigPlugin extends GenericPlugin {
 	 */
 	public function manage($args, $request) {
 		switch ($request->getUserVar('verb')) {
-			case 'settings':
-				$this->import('ImportConfigSettingsForm');
-				$form = new ImportConfigSettingsForm($this);
+		case 'settings':
+			$this->import('ImportConfigSettingsForm');
+			$form = new ImportConfigSettingsForm($this);
 
-				if (!$request->getUserVar('save')) {
-					$form->initData();
-					return new JSONMessage(true, $form->fetch($request));
-				}
+			if (!$request->getUserVar('save')) {
+				$form->initData();
+				return new JSONMessage(true, $form->fetch($request));
+			}
 
-				$form->readInputData();
+			$form->readInputData();
 
-				if ($form->validate()) {
-					$form->execute();
-					return new JSONMessage(true);
-				}
+			if ($form->validate()) {
+				$form->execute();
+				return new JSONMessage(true);
+			}
 		}
 		return parent::manage($args, $request);
 	}

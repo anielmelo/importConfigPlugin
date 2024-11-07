@@ -22,29 +22,27 @@ class ImportConfigSettingsForm extends Form {
 		$this->addCheck(new FormValidatorCSRF($this));
 	}
 
-  public function initData() {
-    $contextDao = DAORegistry::getDAO('SiteJournalDAO');
-    
-    $context = Application::get()->getRequest()->getContext();
-    $currentContextId = $context->getId();
+	public function initData() {
+		$contextDao = DAORegistry::getDAO('SiteJournalDAO');
 
-    $journals = $contextDao->getAll($currentContextId);
+		$context = Application::get()->getRequest()->getContext();
+		$currentContextId = $context->getId();
 
+		$journals = $contextDao->getAll($currentContextId);
 
-    $journalOptions = [];
-    $journalOptions[0] = 'Portal';
-    
-    foreach ($journals as $journal_id => $journal_name) {
-      $journalOptions[$journal_id] = $journal_name;
-    }
+		$journalOptions = [];
+		$journalOptions[0] = 'Portal';
 
-    $this->setData('journalOptions', $journalOptions);
+		foreach ($journals as $journal_id => $journal_name) {
+			$journalOptions[$journal_id] = $journal_name;
+		}
+
+		$this->setData('journalOptions', $journalOptions);
 		parent::initData();
 	}
 
-  public function readInputData() {
-
-    $this->readUserVars(['selectedJournal']);
+	public function readInputData() {
+		$this->readUserVars(['selectedJournal']);
 		parent::readInputData();
 	}
 
@@ -55,21 +53,20 @@ class ImportConfigSettingsForm extends Form {
 		return parent::fetch($request, $template, $display);
 	}
 
-  public function execute(...$functionArgs) {
+	public function execute(...$functionArgs) {
+		$sourceContextId = $this->getData('selectedJournal');
 
-    $sourceContextId = $this->getData('selectedJournal');
-    
-    $context = Application::get()->getRequest()->getContext();
-    
-    if (!$context) {
-      return false;
-    }
+		$context = Application::get()->getRequest()->getContext();
 
-    $currentContextId = $context->getId();
+		if (!$context) {
+			return false;
+		}
 
-    $this->importPlugins($sourceContextId, $currentContextId);
-    $this->applyConfiguration($sourceContextId, $currentContextId);
-    $this->importNavigationMenu($sourceContextId, $currentContextId);
+		$currentContextId = $context->getId();
+
+		$this->importPlugins($sourceContextId, $currentContextId);
+		$this->applyConfiguration($sourceContextId, $currentContextId);
+		$this->importNavigationMenu($sourceContextId, $currentContextId);
 
 		import('classes.notification.NotificationManager');
 		$notificationMgr = new NotificationManager();
@@ -170,13 +167,13 @@ class ImportConfigSettingsForm extends Form {
 	 * @param $settingDao class DAO to get/update a setting
 	 * @param $configName string to access the specific setting
 	 */
-  private function insertConfigurationInContext($sourceContextId, $currentContextId, $settingDao, $configName) {
-    if ($sourceContextId == 0) {
-      $configuration = $settingDao->getSiteSetting($configName);
-    } else {
-      $configuration = $settingDao->getJournalSetting($sourceContextId, $configName);
-    }
-    
+	private function insertConfigurationInContext($sourceContextId, $currentContextId, $settingDao, $configName) {
+		if ($sourceContextId == 0) {
+			$configuration = $settingDao->getSiteSetting($configName);
+		} else {
+			$configuration = $settingDao->getJournalSetting($sourceContextId, $configName);
+		}
+
 		if (!$configuration) {
 			error_log('configuration not found: ' . $configName);
 			return;
@@ -184,36 +181,36 @@ class ImportConfigSettingsForm extends Form {
 
 		foreach ($configuration as $setting_name => $setting_value) {
 
-      if ($configName == 'styleSheet') {
-        $this->copyStyleSheet($setting_value, $sourceContextId, $currentContextId);
+			if ($configName == 'styleSheet') {
+				$this->copyStyleSheet($setting_value, $sourceContextId, $currentContextId);
 			}
 
 			$settingDao->updateJournalSetting($currentContextId, $setting_name, $setting_value);
 		}
 	}
 
-  private function copyStyleSheet($styleSheet, $sourceContextId, $currentContextId) {
-    $data = json_decode($styleSheet, true);
-    $style = $data['uploadName'];
-    $sourceDirectory = '';
+	private function copyStyleSheet($styleSheet, $sourceContextId, $currentContextId) {
+		$data = json_decode($styleSheet, true);
+		$style = $data['uploadName'];
+		$sourceDirectory = '';
 
-    if ($sourceContextId == 0) {
-      $sourceDirectory = 'site';
-    } else {
-      $sourceDirectory = 'journals' . '/' . $sourceContextId;
-    }
+		if ($sourceContextId == 0) {
+			$sourceDirectory = 'site';
+		} else {
+			$sourceDirectory = 'journals' . '/' . $sourceContextId;
+		}
 
-    $publicDir = realpath('public');
-    $sourceFile = $publicDir . '/' . $sourceDirectory . '/' . $style;
-    $destinationDir = $publicDir . '/journals/' . $currentContextId . '/';
-    $destinationFile = $destinationDir . $style;
+		$publicDir = realpath('public');
+		$sourceFile = $publicDir . '/' . $sourceDirectory . '/' . $style;
+		$destinationDir = $publicDir . '/journals/' . $currentContextId . '/';
+		$destinationFile = $destinationDir . $style;
 
-    if (copy($sourceFile, $destinationFile)) {
-      error_log('File successfully copied to: ' . $destinationDir);
-    } else {
-      error_log('Failed to copy the file.');
-    }
-  }
+		if (copy($sourceFile, $destinationFile)) {
+			error_log('File successfully copied to: ' . $destinationDir);
+		} else {
+			error_log('Failed to copy the file.');
+		}
+	}
 
 	/**
 	 * Imports navigation menus and items from one context to another.

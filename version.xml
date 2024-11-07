@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE version SYSTEM "../../../lib/pkp/dtd/pluginVersion.dtd">
 <!--
-  * version.xml
-  *
-  * Copyright (c) 2017-2021 Simon Fraser University
-  * Copyright (c) 2017-2021 John Willinsky
-  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
-  *
-  * Plugin version information.
-  -->
+* version.xml
+*
+* Copyright (c) 2017-2021 Simon Fraser University
+* Copyright (c) 2017-2021 John Willinsky
+* Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+*
+* Plugin version information.
+-->
 <version>
 	<application>importConfig</application>
 	<type>plugins.generic</type>

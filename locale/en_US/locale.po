@@ -12,13 +12,14 @@ msgstr ""
 "Language: \n"
 
 msgid "plugins.generic.importConfig.displayName"
-msgstr "Import plugin"
+msgstr "Import Plugin"
 
 msgid "plugins.generic.importConfig.description"
-msgstr "A plugin for import site's settings."
+msgstr "This plugin imports the settings from the selected context."
 
 msgid "plugins.generic.importConfig.templateDescription"
-msgstr "Import site settings: custom block, custom header, plugin theme and style sheet."
+msgstr "Import settings: Custom Blocks, Custom Header, Theme Plugin, and Style Sheet."
 
 msgid "plugins.generic.importConfig.templateWarning"
-msgstr "Importing site settings means overwriting these journal settings!"
+msgstr "Warning! The ImportConfig plugin will overwrite all current journal settings! "
+"Evaluate carefully!"
