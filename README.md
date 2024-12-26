@@ -6,15 +6,16 @@ O plugin **ImportConfig** permite importar configurações do portal e outras re
 
 ## Instalação
 
-1. Clone o repositório e coloque-o no diretório de plugins genéricos (`plugins/generic/`) do OJS dentro de uma pasta chamada `importConfig`.
-2. No painel de administração do OJS, vá até a seção de plugins genéricos e ative o plugin.
+1. Clone o repositório e coloque-o no diretório de plugins genéricos (`plugins/generic/`) do OJS.
+2. Altere o nome da pasta do plugin para `importConfig`.
+3. No painel de administração do OJS, vá até a seção de plugins genéricos e ative o plugin.
 
 ## Uso
 
 Após a ativação, você pode configurar o plugin:
 
 1. Navegue até a página de configuração do plugin.
-2. Leia as informações do formulário e clique em "Salvar".
+2. Leia as informações do formulário, selecione o contexto de importação e clique em "Salvar".
 
 ## Importação
 

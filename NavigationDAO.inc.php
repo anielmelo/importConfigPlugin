@@ -33,8 +33,31 @@ class NavigationDAO extends DAO {
 		}
 
 		return $data;
-	}
+  	}
 
+  /**
+   * Retrieve navigation menu item settings based on locale and navigation item ID.
+   *
+   * @param string $locale The locale to filter settings by.
+   * @param int $navigationItemId The ID of the navigation menu item to filter by.
+   * @return array|null Returns an array of settings data rows if found, or null if no data is found.
+   */
+	function getNavigationSetting($locale, $navigationItemId) {
+		$data = array();
+
+		$result = $this->retrieve('SELECT * FROM navigation_menu_item_settings WHERE (setting_name = "titleLocaleKey" OR locale = ?) AND navigation_menu_item_id = ?',
+			[$locale, (int) $navigationItemId]);
+
+		foreach ($result as $row) {
+			$data[] = (array) $row;
+		}
+
+		if (count($data) == 0) {
+			return null;
+		}
+
+		return $data;
+	}
 
 	/**
 	 * Retrieve the assignment of a navigation item to a menu.
@@ -114,6 +137,20 @@ class NavigationDAO extends DAO {
 			'navigation_menu_item_settings',
 			[
 				'navigation_menu_item_id' => $navigationItemId,
+				'setting_name'            => $name,
+				'setting_value'           => $value,
+				'setting_type'            => $type,
+			],
+			[]
+		);
+	}
+
+	function updateNavigationSettingWithLocale($navigationItemId, $locale, $name, $value, $type) {
+		return $this->replace(
+			'navigation_menu_item_settings',
+			[
+				'navigation_menu_item_id' => $navigationItemId,
+				'locale'		  => $locale,
 				'setting_name'            => $name,
 				'setting_value'           => $value,
 				'setting_type'            => $type,

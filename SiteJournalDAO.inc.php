@@ -13,14 +13,16 @@
 
 
 import('lib.pkp.classes.db.DAO');
-class SiteJournalDAO extends DAO {
+class SiteJournalDAO extends DAO
+{
 
 	/**
 	 * Retrieve all journals except the specified one.
 	 * @param $currentContextId int Context ID to exclude
 	 * @return null||array
 	 */
-	function getAll($currentContextId) {
+	function getAllContexts($currentContextId)
+	{
 		$result = $this->retrieve(
 			'SELECT journal_id, setting_value FROM journal_settings WHERE setting_name = "name" AND setting_value != "NULL" AND journal_id != ?',
 			array($currentContextId)
@@ -44,7 +46,8 @@ class SiteJournalDAO extends DAO {
 	 * @param $settingName string Setting name
 	 * @return null||array
 	 */
-	function getSiteSetting($settingName) {
+	function getSiteSetting($settingName)
+	{
 		$result = $this->retrieve(
 			'SELECT setting_name, setting_value FROM site_settings WHERE setting_name = ?',
 			array($settingName)
@@ -69,7 +72,8 @@ class SiteJournalDAO extends DAO {
 	 * @param $settingName string Setting name
 	 * @return null||array
 	 */
-	function getJournalSetting($journalId, $settingName) {
+	function getJournalSetting($journalId, $settingName)
+	{
 		$result = $this->retrieve(
 			'SELECT setting_name, setting_value FROM journal_settings WHERE journal_id = ? and setting_name = ?',
 			array((int) $journalId, $settingName)
@@ -95,7 +99,8 @@ class SiteJournalDAO extends DAO {
 	 * @param $settingValue mixed Setting value
 	 * @param $settingType string data type of the setting. If omitted, type will be NULL
 	 */
-	function updateJournalSetting($journalId, $settingName, $settingValue, $settingType = NULL) {
+	function updateJournalSetting($journalId, $settingName, $settingValue, $settingType = NULL)
+	{
 		$this->replace(
 			'journal_settings',
 			array(
@@ -107,5 +112,4 @@ class SiteJournalDAO extends DAO {
 			array('journal_id', 'setting_name')
 		);
 	}
-
 }

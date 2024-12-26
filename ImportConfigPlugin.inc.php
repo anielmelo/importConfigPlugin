@@ -10,29 +10,41 @@
  */
 
 import('lib.pkp.classes.plugins.GenericPlugin');
-class ImportConfigPlugin extends GenericPlugin {
+class ImportConfigPlugin extends GenericPlugin
+{
 
-	public function register($category, $path, $mainContextId = NULL) {
+	public function register($category, $path, $mainContextId = NULL)
+	{
 		$success = parent::register($category, $path);
 		if ($success && $this->getEnabled()) {
 			$this->import('SiteJournalDAO');
 			DAORegistry::registerDAO('SiteJournalDAO', new SiteJournalDAO());
 
+
 			$this->import('NavigationDAO');
 			DAORegistry::registerDAO('NavigationDAO', new NavigationDAO());
+
+			$this->import('commands.Command');
+			$this->import('commands.CommandExecutor');
+			$this->import('commands.ImportConfigurationCommand');
+			$this->import('commands.ImportPluginCommand');
+			$this->import('commands.ImportNavigationCommand');
 		}
 		return $success;
 	}
 
-	public function getDisplayName() {
+	public function getDisplayName()
+	{
 		return __('plugins.generic.importConfig.displayName');
 	}
 
-	public function getDescription() {
+	public function getDescription()
+	{
 		return __('plugins.generic.importConfig.description');
 	}
 
-	public function getActions($request, $actionArgs) {
+	public function getActions($request, $actionArgs)
+	{
 
 		$actions = parent::getActions($request, $actionArgs);
 
@@ -75,23 +87,24 @@ class ImportConfigPlugin extends GenericPlugin {
 	 * @param PKPRequest $request Request object
 	 * @return JSONMessage Response in JSON format
 	 */
-	public function manage($args, $request) {
+	public function manage($args, $request)
+	{
 		switch ($request->getUserVar('verb')) {
-		case 'settings':
-			$this->import('ImportConfigSettingsForm');
-			$form = new ImportConfigSettingsForm($this);
+			case 'settings':
+				$this->import('ImportConfigSettingsForm');
+				$form = new ImportConfigSettingsForm($this);
 
-			if (!$request->getUserVar('save')) {
-				$form->initData();
-				return new JSONMessage(true, $form->fetch($request));
-			}
+				if (!$request->getUserVar('save')) {
+					$form->initData();
+					return new JSONMessage(true, $form->fetch($request));
+				}
 
-			$form->readInputData();
+				$form->readInputData();
 
-			if ($form->validate()) {
-				$form->execute();
-				return new JSONMessage(true);
-			}
+				if ($form->validate()) {
+					$form->execute();
+					return new JSONMessage(true);
+				}
 		}
 		return parent::manage($args, $request);
 	}

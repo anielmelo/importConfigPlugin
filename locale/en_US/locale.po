@@ -1,3 +1,4 @@
+
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
@@ -15,11 +16,22 @@ msgid "plugins.generic.importConfig.displayName"
 msgstr "Import Plugin"
 
 msgid "plugins.generic.importConfig.description"
-msgstr "This plugin imports the settings from the selected context."
+msgstr "This plugin imports the selected context settings."
+
+msgid "plugins.generic.importConfig.selectTitle"
+msgstr "Select a context:"
 
 msgid "plugins.generic.importConfig.templateDescription"
-msgstr "Import settings: Custom Blocks, Custom Header, Theme Plugin, and Style Sheet."
+msgstr "Import: "
+"<ul> "
+"	<li>plugin settings;</li>"
+"	<li>journal theme;</li>"
+"	<li>sidebar;</li>"
+"	<li>stylesheet;</li>"
+"	<li>navigation menus.</li>"
+"</ul> "
 
 msgid "plugins.generic.importConfig.templateWarning"
-msgstr "Warning! The ImportConfig plugin will overwrite all current journal settings! "
-"Evaluate carefully!"
+msgstr "Warning! Running the plugin will overwrite current journal settings! "
+"<br> Evaluate carefully!"
+

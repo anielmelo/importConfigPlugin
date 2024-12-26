@@ -22,7 +22,7 @@ action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic"
 	<!-- Always add the csrf token to secure your form -->
 	{csrf}
 
-	<label for="journalSelect">Selecione uma Revista:</label>
+	<label for="journalSelect">{translate key="plugins.generic.importConfig.selectTitle"}</label>
 	<select name="selectedJournal" id="journalSelect">
 		{foreach from=$journalOptions key=journalId item=journalName}
 			<option value="{$journalId}">{$journalName}</option>
