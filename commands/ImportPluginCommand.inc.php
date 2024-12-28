@@ -20,6 +20,7 @@ class ImportPluginCommand implements Command
         'pdfjsviewerplugin',
         'shariffplugin',
         'subscriptionblockplugin',
+	'makesubmissionblockplugin',
     );
 
     public function __construct($sourceContextId, $currentContextId, $locale, $pluginDao)
